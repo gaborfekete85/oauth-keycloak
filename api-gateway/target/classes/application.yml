@@ -1,0 +1,85 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: "${EUREKA_ZONE:http://localhost:8761/eureka/}"
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      default-filters:
+        - TokenRelay
+      routes:
+        - id: stock-service-test
+          uri: http://localhost:8040
+          predicates:
+              - Path=/test/**
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: stock-service-order
+          uri: http://localhost:8040
+          predicates:
+            - Path=/order/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=0
+            - name: Retry
+              args:
+                retries: 1
+                statuses: UNAUTHORIZED
+                methods: GET,POST
+                backoff:
+                  firstBackoff: 10ms
+                  maxBackoff: 50ms
+                  factor: 2
+                  basedOnPreviousValue: false
+        - id: exchange-service
+          uri: http://localhost:8041
+          predicates:
+            - Path=/rates/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=0
+            - name: Retry
+              args:
+                retries: 1
+                statuses: UNAUTHORIZED
+                methods: GET,POST
+                backoff:
+                  firstBackoff: 10ms
+                  maxBackoff: 50ms
+                  factor: 2
+                  basedOnPreviousValue: false
+      discovery:
+        locator:
+          enabled: true
+  sleuth:
+    sampler:
+      probability: 1
+  zipkin:
+    baseUrl: ${ZIPKIN_BASE_URL:http://localhost:9411}
+
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            token-uri: http://localhost:8888/auth/realms/master/protocol/openid-connect/token
+            authorization-uri: http://localhost:8888/auth/realms/master/protocol/openid-connect/auth
+            userinfo-uri: http://localhost:8888/auth/realms/master/protocol/openid-connect/userinfo
+            user-name-attribute: preferred_username
+        registration:
+          keycloak-with-test-scope:
+            provider: keycloak
+            client-id: ${CLIENT_ID:spring-with-test-scope}
+            client-secret: ${CLIENT_SECRET:b544e6c3-1e15-479d-b6d9-3a7bb43bc107}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+
+server.port: 8060
+
+logging.level:
+  org.springframework.cloud.gateway: DEBUG
+  org.springframework.security: DEBUG
+  org.springframework.web.reactive.function.client: TRACE

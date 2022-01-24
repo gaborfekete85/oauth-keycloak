@@ -1,0 +1,76 @@
+version: '3'
+services:
+  eureka-service:
+    image: fiverr/eureka-server:latest
+    container_name: eureka-service
+    expose:
+      - "8761"
+    ports:
+      - "127.0.0.1:8761:8761"
+  gateway-service:
+    image: fiverr/gateway-service:latest
+    container_name: gateway-service
+    expose:
+      - "8060"
+    ports:
+      - "127.0.0.1:8060:8060"
+    depends_on:
+      - eureka-service
+      - keycloak-service
+    environment:
+      EUREKA_ZONE: http://eureka-service:8761/eureka/
+      ZIPKIN_BASE_URL: http://zipkin-service:9411
+      AUTH_BASE_URL: http://keycloak-service:8888
+      ISSUER_URI: ${ISSUER_URI}
+      TOKEN_URI: ${TOKEN_URI}
+      AUTHORIZATION_URI: ${AUTHORIZATION_URI}
+      USERINFO_URI: ${USERINFO_URI}
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+  stock-service:
+    image: fiverr/stock-service:latest
+    container_name: stock-service
+    expose:
+      - "8040"
+    ports:
+      - "127.0.0.1:8040:8040"
+    depends_on:
+      - eureka-service
+      - gateway-service
+      - keycloak-service
+    environment:
+      ISSUER_URI: ${ISSUER_URI}
+      EUREKA_ZONE: http://eureka-service:8761/eureka/
+      ZIPKIN_BASE_URL: http://zipkin-service:9411
+  exchange-service:
+    image: fiverr/exchange-service:latest
+    container_name: exchange-service
+    expose:
+      - "8041"
+    ports:
+      - "127.0.0.1:8041:8041"
+    depends_on:
+      - eureka-service
+      - gateway-service
+      - keycloak-service
+    environment:
+      ISSUER_URI: ${ISSUER_URI}
+      EUREKA_ZONE: http://eureka-service:8761/eureka/
+      ZIPKIN_BASE_URL: http://zipkin-service:9411
+  zipkin-service:
+    image: openzipkin/zipkin
+    container_name: zipkin-service
+    expose:
+      - "9411"
+    ports:
+      - "9411:9411"
+  keycloak-service:
+    image: quay.io/keycloak/keycloak:16.1.0
+    container_name: keycloak-service
+    environment:
+      KEYCLOAK_USER: "admin"
+      KEYCLOAK_PASSWORD: "admin"
+    expose:
+      - "8888"
+    ports:
+      - "8888:8080"

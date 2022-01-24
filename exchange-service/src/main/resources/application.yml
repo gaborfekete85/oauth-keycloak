@@ -1,0 +1,20 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: "${EUREKA_ZONE:http://localhost:8761/eureka/}"
+
+spring:
+  application:
+    name: exchange-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "${ISSUER_URI:http://localhost:8888/auth/realms/master}"
+
+logging.level:
+  org.springframework.cloud.gateway: DEBUG
+  org.springframework.security: DEBUG
+  org.springframework.web.reactive.function.client: TRACE
+
+server.port: 8041

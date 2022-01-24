@@ -1,0 +1,5 @@
+pl\piomin\samples\security\gateway\GatewayApplication.class
+pl\piomin\samples\security\gateway\filter\TokenPreFilter.class
+pl\piomin\samples\security\gateway\filter\GlobalFilterConfiguration.class
+pl\piomin\samples\security\gateway\filter\AccessTokenResponse.class
+pl\piomin\samples\security\gateway\config\SecurityConfig.class

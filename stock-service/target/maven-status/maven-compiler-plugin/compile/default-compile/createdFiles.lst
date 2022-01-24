@@ -1,0 +1,9 @@
+com\aks\stock\controller\SymbolNotSupportedException.class
+com\aks\stock\controller\TestController.class
+com\aks\stock\controller\StockController.class
+com\aks\stock\config\WebClientConfig.class
+com\aks\stock\config\SecurityConfig.class
+com\aks\stock\service\ExchangeRateException.class
+com\aks\stock\service\ExchangeRateService.class
+com\aks\stock\model\Order.class
+com\aks\stock\StockApplication.class
