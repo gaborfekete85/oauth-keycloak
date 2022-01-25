@@ -1,7 +1,9 @@
 # oauth-keycloak
 
+```sh
 docker run -p 8888:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin quay.io/keycloak/keycloak:16.1.0
- * Login to Keycloak: [http://localhost:8888](http://localhost:8888) - admin / admin
+```
+* Login to Keycloak: [http://localhost:8888](http://localhost:8888) - admin / admin
 
 ## Create a client
  - Client ID: oauth-client
